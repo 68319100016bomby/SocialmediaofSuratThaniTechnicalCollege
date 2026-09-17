@@ -1,0 +1,8 @@
+<?php
+namespace Tests\Feature;
+use App\Models\{Friendship,Post,Report,User};use Illuminate\Foundation\Testing\RefreshDatabase;use Tests\TestCase;
+class SocialNetworkTest extends TestCase{use RefreshDatabase;
+ public function test_guest_is_sent_to_login():void{$this->get('/')->assertRedirect('/login');$this->get('/login')->assertOk();}
+ public function test_member_can_use_core_social_flow():void{$user=User::factory()->create(['role'=>'student','is_active'=>true]);$friend=User::factory()->create(['role'=>'student','is_active'=>true]);$this->actingAs($user)->get('/')->assertOk();$this->post('/posts',['content'=>'ทดสอบ #STC','visibility'=>'college'])->assertRedirect();$post=Post::first();$this->post("/posts/{$post->id}/reaction",['type'=>'love'])->assertRedirect();$this->post("/posts/{$post->id}/comments",['content'=>'ความคิดเห็นทดสอบ'])->assertRedirect();$this->post("/friends/request/{$friend->id}")->assertRedirect();$this->assertDatabaseHas('posts',['content'=>'ทดสอบ #STC'])->assertDatabaseHas('reactions',['type'=>'love'])->assertDatabaseHas('comments',['content'=>'ความคิดเห็นทดสอบ'])->assertDatabaseHas('friendships',['addressee_id'=>$friend->id]);}
+ public function test_admin_can_open_moderation_dashboard():void{$admin=User::factory()->create(['role'=>'admin','is_active'=>true]);$member=User::factory()->create(['role'=>'student','is_active'=>true]);$post=Post::create(['user_id'=>$member->id,'content'=>'reported','visibility'=>'college']);Report::create(['reporter_id'=>$member->id,'reportable_type'=>Post::class,'reportable_id'=>$post->id,'reason'=>'other','status'=>'pending']);$this->actingAs($admin)->get('/admin')->assertOk()->assertSee('reported');}
+}
