@@ -4,16 +4,11 @@ use App\Http\Controllers\{AuthController, SocialController};
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-// --- Route ชั่วคราวสำหรับรัน Migration บน Render (อยู่นอก auth middleware เพื่อให้เปิดได้ทันที) ---
+// --- Route สำหรับรันสร้างฐานข้อมูลบน TiDB Cloud (ตัด storage:link ออก) ---
 Route::get('/run-migrate', function () {
     try {
-        // ล้างตารางเดิมที่มีปัญหาแล้วสร้างใหม่ทั้งหมดพร้อม auto_increment
         Artisan::call('migrate:fresh', ['--force' => true]);
         $output = Artisan::output();
-
-        // ทำการเชื่อมต่อ storage สำหรับการอัปโหลดไฟล์/รูปภาพ
-        Artisan::call('storage:link');
-        $output .= "\n" . Artisan::output();
 
         return '<pre style="background:#111; color:#00ff66; padding:20px; font-size:14px;">' . $output . '</pre>';
     } catch (\Throwable $e) {
