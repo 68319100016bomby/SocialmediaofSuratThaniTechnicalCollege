@@ -1,11 +1,59 @@
 <?php
-use App\Http\Controllers\{AuthController,SocialController};use Illuminate\Support\Facades\Route;
-Route::middleware('guest')->group(function(){Route::get('/login',[AuthController::class,'loginForm'])->name('login');Route::post('/login',[AuthController::class,'login'])->name('login.submit');Route::get('/register',[AuthController::class,'registerForm'])->name('register');Route::post('/register',[AuthController::class,'register'])->name('register.submit');});
-Route::middleware('auth')->group(function(){
-Route::get('/',[SocialController::class,'feed'])->name('feed');Route::post('/logout',[AuthController::class,'logout'])->name('logout');
-Route::post('/posts',[SocialController::class,'storePost'])->name('posts.store');Route::delete('/posts/{post}',[SocialController::class,'destroyPost'])->name('posts.destroy');Route::post('/posts/{post}/comments',[SocialController::class,'comment'])->name('comments.store');Route::post('/posts/{post}/reaction',[SocialController::class,'react'])->name('reactions.store');Route::post('/posts/{post}/report',[SocialController::class,'report'])->name('reports.store');
-Route::get('/friends',[SocialController::class,'friends'])->name('friends');Route::post('/friends/request/{user}',[SocialController::class,'friendRequest'])->name('friends.request');Route::patch('/friends/{friendship}',[SocialController::class,'friendAction'])->name('friends.action');
-Route::get('/groups',[SocialController::class,'groups'])->name('groups');Route::post('/groups',[SocialController::class,'createGroup'])->name('groups.store');Route::get('/groups/{group}',[SocialController::class,'group'])->name('groups.show');Route::post('/groups/{group}/join',[SocialController::class,'joinGroup'])->name('groups.join');
-Route::get('/messages',[SocialController::class,'messages'])->name('messages');Route::get('/messages/{conversation}',[SocialController::class,'messages'])->name('messages.show');Route::post('/messages/start/{user}',[SocialController::class,'startConversation'])->name('messages.start');Route::post('/messages/{conversation}',[SocialController::class,'sendMessage'])->name('messages.send');
-Route::get('/search',[SocialController::class,'search'])->name('search');Route::get('/admin',[SocialController::class,'admin'])->name('admin');Route::patch('/admin/reports/{report}',[SocialController::class,'moderate'])->name('admin.moderate');Route::patch('/admin/users/{user}',[SocialController::class,'toggleUser'])->name('admin.users.toggle');
+
+use App\Http\Controllers\{AuthController, SocialController};
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
+
+// --- Route ชั่วคราวสำหรับรัน Migration บน Render (อยู่นอก auth middleware เพื่อให้เปิดได้ทันที) ---
+Route::get('/run-migrate', function () {
+    try {
+        // ล้างตารางเดิมที่มีปัญหาแล้วสร้างใหม่ทั้งหมดพร้อม auto_increment
+        Artisan::call('migrate:fresh', ['--force' => true]);
+        $output = Artisan::output();
+
+        // ทำการเชื่อมต่อ storage สำหรับการอัปโหลดไฟล์/รูปภาพ
+        Artisan::call('storage:link');
+        $output .= "\n" . Artisan::output();
+
+        return '<pre style="background:#111; color:#00ff66; padding:20px; font-size:14px;">' . $output . '</pre>';
+    } catch (\Throwable $e) {
+        return '<pre style="background:#111; color:#ff4444; padding:20px; font-size:14px;">' . $e->getMessage() . '</pre>';
+    }
+});
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/', [SocialController::class, 'feed'])->name('feed');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::post('/posts', [SocialController::class, 'storePost'])->name('posts.store');
+    Route::delete('/posts/{post}', [SocialController::class, 'destroyPost'])->name('posts.destroy');
+    Route::post('/posts/{post}/comments', [SocialController::class, 'comment'])->name('comments.store');
+    Route::post('/posts/{post}/reaction', [SocialController::class, 'react'])->name('reactions.store');
+    Route::post('/posts/{post}/report', [SocialController::class, 'report'])->name('reports.store');
+
+    Route::get('/friends', [SocialController::class, 'friends'])->name('friends');
+    Route::post('/friends/request/{user}', [SocialController::class, 'friendRequest'])->name('friends.request');
+    Route::patch('/friends/{friendship}', [SocialController::class, 'friendAction'])->name('friends.action');
+
+    Route::get('/groups', [SocialController::class, 'groups'])->name('groups');
+    Route::post('/groups', [SocialController::class, 'createGroup'])->name('groups.store');
+    Route::get('/groups/{group}', [SocialController::class, 'group'])->name('groups.show');
+    Route::post('/groups/{group}/join', [SocialController::class, 'joinGroup'])->name('groups.join');
+
+    Route::get('/messages', [SocialController::class, 'messages'])->name('messages');
+    Route::get('/messages/{conversation}', [SocialController::class, 'messages'])->name('messages.show');
+    Route::post('/messages/start/{user}', [SocialController::class, 'startConversation'])->name('messages.start');
+    Route::post('/messages/{conversation}', [SocialController::class, 'sendMessage'])->name('messages.send');
+
+    Route::get('/search', [SocialController::class, 'search'])->name('search');
+    Route::get('/admin', [SocialController::class, 'admin'])->name('admin');
+    Route::patch('/admin/reports/{report}', [SocialController::class, 'moderate'])->name('admin.moderate');
+    Route::patch('/admin/users/{user}', [SocialController::class, 'toggleUser'])->name('admin.users.toggle');
 });
