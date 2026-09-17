@@ -1,1 +1,55 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>เข้าสู่ระบบ — STC Connect</title><link rel="icon" href="{{ asset('images/logosrtc.png') }}"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Prompt:wght@600;700&display=swap" rel="stylesheet">@vite(['resources/css/app.css','resources/js/app.js'])</head><body class="auth-page"><div class="auth-brand"><img src="{{ asset('images/logosrtc.png') }}" alt="ตราวิทยาลัยเทคนิคสุราษฎร์ธานี"><p>พื้นที่สื่อสาร ข่าวสาร ความรู้ และกิจกรรม<br>สำหรับชาววิทยาลัยเทคนิคสุราษฎร์ธานี</p><div class="auth-points"><span>✓ เฉพาะสมาชิกของวิทยาลัย</span><span>✓ ปลอดภัยและมีผู้ดูแล</span><span>✓ เชื่อมต่อทุกแผนกวิชา</span></div></div><main class="auth-card"><div class="auth-title"><small>COLLEGE SOCIAL NETWORK</small><h1>ยินดีต้อนรับสู่<br><span>STC Connect</span></h1><p>เข้าสู่ระบบด้วยบัญชีสมาชิกของวิทยาลัย</p></div>@if($errors->any())<div class="flash error">{{ $errors->first() }}</div>@endif<form method="post" action="{{ route('login.submit') }}">@csrf<label>อีเมล<input type="email" name="email" value="{{ old('email','student@stc.ac.th') }}" required autofocus></label><label>รหัสผ่าน<input type="password" name="password" value="password" required></label><label class="check"><input type="checkbox" name="remember"> จดจำการเข้าสู่ระบบ</label><button class="btn primary wide">เข้าสู่ระบบ</button></form><div class="demo-box"><b>บัญชีทดลอง</b><span>นักศึกษา: student@stc.ac.th</span><span>ผู้ดูแล: admin@stc.ac.th</span><span>รหัสผ่าน: password</span></div><p class="auth-switch">ยังไม่มีบัญชี? <a href="{{ route('register') }}">สมัครสมาชิก</a></p></main></body></html>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>เข้าสู่ระบบ — STC Connect</title>
+    <link rel="icon" href="{{ asset('images/logosrtc.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Prompt:wght@600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css','resources/js/app.js'])
+</head>
+<body class="auth-page">
+    <div class="auth-brand">
+        <img src="{{ asset('images/logosrtc.png') }}" alt="ตราวิทยาลัยเทคนิคสุราษฎร์ธานี">
+        <p>พื้นที่สื่อสาร ข่าวสาร ความรู้ และกิจกรรม<br>สำหรับชาววิทยาลัยเทคนิคสุราษฎร์ธานี</p>
+        <div class="auth-points">
+            <span>✓ เฉพาะสมาชิกของวิทยาลัย</span>
+            <span>✓ ปลอดภัยและมีผู้ดูแล</span>
+            <span>✓ เชื่อมต่อทุกแผนกวิชา</span>
+        </div>
+    </div>
+    <main class="auth-card">
+        <div class="auth-title">
+            <small>COLLEGE SOCIAL NETWORK</small>
+            <h1>ยินดีต้อนรับสู่<br><span>STC Connect</span></h1>
+            <p>เข้าสู่ระบบด้วยบัญชีสมาชิกของวิทยาลัย</p>
+        </div>
+
+        @if($errors->any())
+            <div class="flash error">{{ $errors->first() }}</div>
+        @endif
+
+        <form method="post" action="{{ route('login.submit') }}">
+            @csrf
+            <label>อีเมล
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="example@stc.ac.th" required autofocus>
+            </label>
+            <label>รหัสผ่าน
+                <input type="password" name="password" placeholder="••••••••" required>
+            </label>
+            <label class="check">
+                <input type="checkbox" name="remember"> จดจำการเข้าสู่ระบบ
+            </label>
+            <button class="btn primary wide">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="demo-box">
+            <b>ช่วยเหลือการเข้าสู่ระบบ</b>
+            <span>ใช้งานด้วยบัญชีอีเมลวิทยาลัย (@stc.ac.th)</span>
+            <span>หากพบปัญหา ติดต่อศูนย์สารสนเทศ: ict@stc.ac.th</span>
+        </div>
+
+        <p class="auth-switch">ยังไม่มีบัญชี? <a href="{{ route('register') }}">สมัครสมาชิก</a></p>
+    </main>
+</body>
+</html>
